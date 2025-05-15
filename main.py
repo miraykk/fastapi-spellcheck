@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 app = FastAPI()
 
 model_name = "miraykoksal/byt5-turkish-spell-check"
@@ -11,6 +14,15 @@ model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 model.eval()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # sadece "http://localhost:8080" da yazabilirsin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class Sentence(BaseModel):
     text: str
